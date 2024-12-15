@@ -12,6 +12,8 @@ export const getOpenRouter = (env: Env) => {
 }
 
 interface Summary {
+	title: string;
+	description: string;
 	keyPoints: {
 		point: string;
 		summary: string;
@@ -25,6 +27,7 @@ export const generateSummary = async (env: Env, articles: Article[]): Promise<Su
 	const prompt = `
 	You are a news summarizer.
 
+	Create a title for the entire summary and also a short description.
 	Compile the following articles into multiple keypoints.
 	The above articles are headlines from the same topic, but from different sources.
 	Please summarize the articles into a concise and informative summary.
@@ -44,18 +47,23 @@ export const generateSummary = async (env: Env, articles: Article[]): Promise<Su
 	`
 
 	const { object } = await generateObject({
-		model: openrouter("meta-llama/llama-3.1-70b-instruct:free"),
+		model: openrouter("google/gemini-2.0-flash-exp:free"),
 		schema: z.object({
+			title: z.string(),
+			description: z.string(),
 			keyPoints: z.array(z.object({
 				point: z.string(),
 				summary: z.string()
 			})),
 		}),
 		mode: "json",
+		maxTokens: 1000,
 		prompt: `${articles.map(article => `Source: ${article.source.name}\n\n${article.content.textContent}\n\n===\n`).join("\n\n")}\n\n${prompt}`
 	})
 
 	const summary = {
+		title: object.title,
+		description: object.description,
 		keyPoints: object.keyPoints,
 		sources: articles.map(article => article.url)
 	}
@@ -73,7 +81,7 @@ export const generateSearchQuery = async (env: Env, description: string): Promis
 	`
 
 	const query = await generateText({
-		model: openrouter("meta-llama/llama-3.1-70b-instruct:free"),
+		model: openrouter("google/gemini-2.0-flash-exp:free"),
 		prompt: prompt,
 		maxTokens: 100
 	});

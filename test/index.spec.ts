@@ -1,5 +1,6 @@
 // test/index.spec.ts
-import { env, createExecutionContext, waitOnExecutionContext, SELF } from "cloudflare:test";
+import { env, createExecutionContext, waitOnExecutionContext, SELF, applyD1Migrations } from "cloudflare:test";
+import { readD1Migrations } from "@cloudflare/vitest-pool-workers/config";
 import { describe, it, expect } from "vitest";
 
 import { Article, getHeadlines } from "../src/lib/news";
@@ -58,18 +59,20 @@ describe("LLM", () => {
 		expect(summary).toHaveProperty("keyPoints");
 		expect(summary.keyPoints[0]).toHaveProperty("point");
 		expect(summary.keyPoints[0]).toHaveProperty("summary");
-	});
+	}, 10000);
 
 	it("should generate a search query", async () => {
 		const query = await generateSearchQuery(env as Env, "AI Progress Accelerates, Raising Both Hope and Concerns for Society's Future");
 		expect(query).toContain("AI");
-	});
+	}, 5000);
 })
 
 describe("Scheduled handler", () => {
 	it("should run upon test path", async () => {
+		await applyD1Migrations(env.DB, env.MIGRATIONS)
+
 		const response = await SELF.fetch("http://localhost/__fetch")
 
 		expect(response.status).toBe(200);
-	}, 10000)
+	}, 20000)
 })

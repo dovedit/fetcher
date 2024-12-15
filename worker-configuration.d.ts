@@ -3,4 +3,5 @@
 interface Env {
 	GNEWS_API_KEY: string;
 	OPENROUTER_API_KEY: string;
+	DB: D1Database;
 }
