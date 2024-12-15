@@ -27,11 +27,8 @@ const executeFetch = async (env: Env) => {
 
 	const summary = await generateSummary(env, articles);
 
-	console.log(articles);
-	console.log(summary);
-
 	const content = `
-		${summary.keyPoints.map((keyPoint, idx) =>
+		${summary.keyPoints.map((keyPoint) =>
 			`* ${keyPoint.point} &middot; ${keyPoint.summary}`
 		)}
 	`
@@ -41,7 +38,7 @@ const executeFetch = async (env: Env) => {
 		INSERT INTO articles (title, description, slug, content, ai_generated, sources)
 		values (?, ?, ?, ?, ?, ?)
 	`
-	await env.DB.prepare(sqlQuery)
+	env.DB.prepare(sqlQuery)
 		.bind(
 			summary.title,
 			summary.description,
@@ -57,7 +54,8 @@ export default {
 	async fetch(req, env): Promise<Response> {
 		if (new URL(req.url).pathname === '/ping') {
 			return new Response('Pong!');
-		} else if (new URL(req.url).pathname === '/__fetch') {
+		// @ts-ignore: TEST is not defined in the type definitions, but is required for testing
+		} else if (new URL(req.url).pathname === '/__fetch' && env.TEST) {
 			await executeFetch(env);
 			return new Response(JSON.stringify({ status: "ok" }), { status: 200 });
 		} else {

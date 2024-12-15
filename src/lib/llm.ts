@@ -47,7 +47,7 @@ export const generateSummary = async (env: Env, articles: Article[]): Promise<Su
 	`
 
 	const { object } = await generateObject({
-		model: openrouter("google/gemini-2.0-flash-exp:free"),
+		model: openrouter("meta-llama/llama-3.1-70b-instruct:free"),
 		schema: z.object({
 			title: z.string(),
 			description: z.string(),
@@ -81,7 +81,7 @@ export const generateSearchQuery = async (env: Env, description: string): Promis
 	`
 
 	const query = await generateText({
-		model: openrouter("google/gemini-2.0-flash-exp:free"),
+		model: openrouter("meta-llama/llama-3.1-70b-instruct:free"),
 		prompt: prompt,
 		maxTokens: 100
 	});

@@ -1,6 +1,4 @@
-// test/index.spec.ts
-import { env, createExecutionContext, waitOnExecutionContext, SELF, applyD1Migrations } from "cloudflare:test";
-import { readD1Migrations } from "@cloudflare/vitest-pool-workers/config";
+import { env, SELF, applyD1Migrations } from "cloudflare:test";
 import { describe, it, expect } from "vitest";
 
 import { Article, getHeadlines } from "../src/lib/news";
@@ -68,11 +66,17 @@ describe("LLM", () => {
 })
 
 describe("Scheduled handler", () => {
-	it("should run upon test path", async () => {
+	it("should run successfully", async () => {
 		await applyD1Migrations(env.DB, env.MIGRATIONS)
 
 		const response = await SELF.fetch("http://localhost/__fetch")
 
 		expect(response.status).toBe(200);
+
+		const db = env.DB;
+		const { results, success } = await db.prepare("SELECT * FROM articles").all();
+
+		expect(success).toBe(true);
+		expect(results).toHaveLength(1);
 	}, 20000)
 })
