@@ -1,10 +1,10 @@
 import { ArticleContent, readUrl } from "./read";
 
 interface GetHeadlinesOptions {
-	category: "general";
-	country: "ro";
-	lang: "ro";
-	maxResults: number;
+	category?: "general";
+	country?: "ro";
+	lang?: "ro";
+	maxResults?: number;
 	searchQuery?: string;
 }
 

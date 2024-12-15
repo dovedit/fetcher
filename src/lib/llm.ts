@@ -1,6 +1,6 @@
 import { type OpenRouterProvider, createOpenRouter } from "@openrouter/ai-sdk-provider"
 import { Article } from "./news";
-import { generateObject } from "ai";
+import { generateObject, generateText } from "ai";
 import { z } from "zod";
 
 export const getOpenRouter = (env: Env) => {
@@ -61,4 +61,22 @@ export const generateSummary = async (env: Env, articles: Article[]): Promise<Su
 	}
 
 	return summary;
+}
+
+export const generateSearchQuery = async (env: Env, description: string): Promise<string> => {
+	const openrouter = getOpenRouter(env);
+
+	const prompt = `
+	Generate a search query, a query that would be used to search on Google, for the following description:
+	${description}
+	Answer only with the search query, and nothing else.
+	`
+
+	const query = await generateText({
+		model: openrouter("meta-llama/llama-3.1-70b-instruct:free"),
+		prompt: prompt,
+		maxTokens: 100
+	});
+
+	return query.text;
 }

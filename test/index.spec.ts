@@ -4,7 +4,7 @@ import { describe, it, expect } from "vitest";
 
 import { Article, getHeadlines } from "../src/lib/news";
 import { readUrl } from "../src/lib/read";
-import { generateSummary } from "../src/lib/llm";
+import { generateSearchQuery, generateSummary } from "../src/lib/llm";
 
 describe("Worker", () => {
 	it ('responds with "Pong!"', async () => {
@@ -14,8 +14,13 @@ describe("Worker", () => {
 });
 
 describe("News fetching", () => {
-	it("returns headlines", async () => {
-		const headlines = await getHeadlines(env as Env);
+	it("returns 1 headline", async () => {
+		const headlines = await getHeadlines(env as Env, { maxResults: 1 });
+		expect(headlines).toHaveLength(1);
+		expect(headlines[0]).toHaveProperty("title");
+	})
+	it("returns 10 headlines", async () => {
+		const headlines = await getHeadlines(env as Env, { maxResults: 10 });
 		expect(headlines).toHaveLength(10);
 		headlines.map(headline => expect(headline).toHaveProperty("title"));
 	})
@@ -53,5 +58,18 @@ describe("LLM", () => {
 		expect(summary).toHaveProperty("keyPoints");
 		expect(summary.keyPoints[0]).toHaveProperty("point");
 		expect(summary.keyPoints[0]).toHaveProperty("summary");
-	})
+	});
+
+	it("should generate a search query", async () => {
+		const query = await generateSearchQuery(env as Env, "AI Progress Accelerates, Raising Both Hope and Concerns for Society's Future");
+		expect(query).toContain("AI");
+	});
+})
+
+describe("Scheduled handler", () => {
+	it("should run upon test path", async () => {
+		const response = await SELF.fetch("http://localhost/__fetch")
+
+		expect(response.status).toBe(200);
+	}, 10000)
 })
