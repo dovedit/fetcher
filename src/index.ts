@@ -46,7 +46,7 @@ const executeFetch = async (env: Env) => {
 				.replaceAll(":", "-"),
 			content,
 			1,
-			`json([${articles.map(article => `'${article.url}'`).join(",")}])`
+			`[${articles.map(article => `'${article.url}'`).join(",")}]`
 		)
 		.run();
 }
