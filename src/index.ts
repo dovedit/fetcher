@@ -2,37 +2,35 @@ import { generateSearchQuery, generateSummary } from "./lib/llm";
 import { Article, getArticle, getHeadlines } from "./lib/news";
 
 const executeFetch = async (env: Env) => {
-	const [articleMetadata] = await getHeadlines(env, {
-		maxResults: 1,
-		category: "general",
-		country: "ro",
-		lang: "ro",
-	});
-
-	const searchQuery = await generateSearchQuery(env, articleMetadata.description);
-
 	const articlesMetadata = await getHeadlines(env, {
 		maxResults: 3,
 		category: "general",
 		country: "ro",
 		lang: "ro",
-		searchQuery: searchQuery
 	});
 
 	let articles = await Promise.all(articlesMetadata.map((articleMetadata) => getArticle(articleMetadata)));
-
 	const summary = await generateSummary(env, articles);
 
 	const content = `
-		${summary.keyPoints.map((keyPoint) =>
-			`* ${keyPoint.point} &middot; ${keyPoint.summary} \n`
-		)}
+		${summary.subjects.map((subject) =>
+			`## ${subject.name}\n` +
+			subject.keyPoints.map((keyPoint) => (
+				`* ${keyPoint.point} &middot; ${keyPoint.summary}`
+			)).join("\n")
+		).join("\n\n")}
 	`
 
 	console.log(articles);
 	console.log(summary);
 	console.log(content);
 
+	const date = new Date().toLocaleDateString("ro-RO", {
+		weekday: "long",
+		year: "numeric",
+		month: "long",
+		day: "numeric"
+	})
 	// Put it into the database
 	const sqlQuery = `
 		INSERT INTO articles (title, description, slug, content, ai_generated, sources)
@@ -40,9 +38,12 @@ const executeFetch = async (env: Env) => {
 	`
 	env.DB.prepare(sqlQuery)
 		.bind(
-			summary.title,
+			`News of ${date}`,
 			summary.description,
-			summary.title.toLowerCase().replaceAll(" ", "-"),
+			date.toLowerCase()
+				.replaceAll(" ", "-")
+				.replaceAll("/", "-")
+				.replaceAll(":", "-"),
 			content,
 			1,
 			`json([${articles.map(article => `'${article.url}'`).join(",")}])`
@@ -55,7 +56,7 @@ export default {
 		if (new URL(req.url).pathname === '/ping') {
 			return new Response('Pong!');
 		// @ts-ignore: TEST is not defined in the type definitions, but is required for testing
-		} else if (new URL(req.url).pathname === '/__fetch' && !env.TEST) {
+		} else if (new URL(req.url).pathname === '/__fetch' && env.TEST) {
 			await executeFetch(env);
 			return new Response(JSON.stringify({ status: "ok" }), { status: 200 });
 		} else {

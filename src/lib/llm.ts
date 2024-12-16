@@ -12,13 +12,15 @@ export const getOpenRouter = (env: Env) => {
 }
 
 interface Summary {
-	title: string;
 	description: string;
-	keyPoints: {
-		point: string;
-		summary: string;
-	}[],
-	sources: string[]
+	subjects: {
+		name: string;
+		keyPoints: {
+			point: string;
+			summary: string;
+		}[],
+	}[];
+	sources: string[];
 }
 
 export const generateSummary = async (env: Env, articles: Article[]): Promise<Summary> => {
@@ -27,18 +29,13 @@ export const generateSummary = async (env: Env, articles: Article[]): Promise<Su
 	const prompt = `
 	You are a news summarizer.
 
-	Create a title for the entire summary and also a short description.
-	Compile the following articles into multiple keypoints.
-	The above articles are headlines from the same topic, but from different sources.
+	Create a short description for the entire summary.
+	Compile the following articles into multiple keypoints with differnet subjects.
 	Please summarize the articles into a concise and informative summary.
 	The key points should be short and to the point.
 	The summary should be at least 500 words long.
 	Each article has a source, which is the name of the news outlet.
-	Please include the sources in the summary.
 	Write the summary in Romanian.
-	If there are no key points, please include a sentence that summarizes the article.
-	If there are no sources, please include a sentence that summarizes the article.
-	If there are no key points or sources, please include a sentence that summarizes the article.
 	Do not include any other information in the summary.
 	Articles will be separated by "==="
 	Answer in JSON format. DO NOT INCLUDE ANY OTHER TEXT.
@@ -52,20 +49,28 @@ export const generateSummary = async (env: Env, articles: Article[]): Promise<Su
 		schema: z.object({
 			title: z.string(),
 			description: z.string(),
-			keyPoints: z.array(z.object({
-				point: z.string(),
-				summary: z.string()
-			})),
+			subjects: z.array(z.object({
+				name: z.string(),
+				keyPoints: z.array(z.object({
+					point: z.string(),
+					summary: z.string()
+				})),
+			}))
 		}),
 		mode: "json",
-		maxTokens: 1000,
+		maxTokens: 8000,
 		prompt: `${articles.map(article => `Source: ${article.source.name}\n\n${article.content.textContent}\n\n===\n`).join("\n\n")}\n\n${prompt}`
 	})
 
 	const summary = {
-		title: object.title,
 		description: object.description,
-		keyPoints: object.keyPoints,
+		subjects: object.subjects.map((subject) => ({
+			name: subject.name,
+			keyPoints: subject.keyPoints.map((keyPoint) => ({
+				point: keyPoint.point,
+				summary: keyPoint.summary
+			}))
+		})),
 		sources: articles.map(article => article.url)
 	}
 

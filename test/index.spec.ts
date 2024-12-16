@@ -13,16 +13,16 @@ describe("Worker", () => {
 });
 
 describe("News fetching", () => {
-	// it("returns 1 headline", async () => {
-	// 	const headlines = await getHeadlines(env as Env, { maxResults: 1 });
-	// 	expect(headlines).toHaveLength(1);
-	// 	expect(headlines[0]).toHaveProperty("title");
-	// })
-	// it("returns 10 headlines", async () => {
-	// 	const headlines = await getHeadlines(env as Env, { maxResults: 10 });
-	// 	expect(headlines).toHaveLength(10);
-	// 	headlines.map(headline => expect(headline).toHaveProperty("title"));
-	// })
+	it("returns 1 headline", async () => {
+		const headlines = await getHeadlines(env as Env, { maxResults: 1 });
+		expect(headlines).toHaveLength(1);
+		expect(headlines[0]).toHaveProperty("title");
+	})
+	it("returns 10 headlines", async () => {
+		const headlines = await getHeadlines(env as Env, { maxResults: 10 });
+		expect(headlines).toHaveLength(10);
+		headlines.map(headline => expect(headline).toHaveProperty("title"));
+	})
 	it("returns on search query", async () => {
 		const headlines = await getHeadlines(env as Env, { searchQuery: "AI in Romania", maxResults: 1 });
 
@@ -30,7 +30,6 @@ describe("News fetching", () => {
 	})
 })
 
-/*
 describe("Article reading", () => {
 	it("returns article content", async () => {
 		const content = await readUrl("https://example.com");
@@ -60,9 +59,9 @@ describe("LLM", () => {
 
 		const summary = await generateSummary(env as Env, [mockArticle]);
 
-		expect(summary).toHaveProperty("keyPoints");
-		expect(summary.keyPoints[0]).toHaveProperty("point");
-		expect(summary.keyPoints[0]).toHaveProperty("summary");
+		expect(summary).toHaveProperty("subjects");
+		expect(summary.subjects[0].keyPoints[0]).toHaveProperty("point");
+		expect(summary.subjects[0].keyPoints[0]).toHaveProperty("summary");
 	}, 10000);
 
 	it("should generate a search query", async () => {
@@ -70,9 +69,7 @@ describe("LLM", () => {
 		expect(query).toContain("AI");
 	}, 5000);
 })
-*/
 
-/*
 describe("Scheduled handler", () => {
 	it("should run successfully", async () => {
 		await applyD1Migrations(env.DB, env.MIGRATIONS)
@@ -85,7 +82,7 @@ describe("Scheduled handler", () => {
 		const { results, success } = await db.prepare("SELECT * FROM articles").all();
 
 		expect(success).toBe(true);
+		console.log(results);
 		expect(results).toHaveLength(1);
 	}, 20000)
 })
-*/
