@@ -9,6 +9,9 @@ on:
     paths:
       - src/**
       - test/**
+      - package.json
+      - package-lock.json
+      - vitest.config.ts
   pull_request:
     branches: [ "main" ]
 

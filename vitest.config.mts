@@ -14,8 +14,8 @@ export default defineWorkersProject(async () => {
 						bindings: {
 							MIGRATIONS: migrations,
 							TEST: true,
-							OPENROUTER_API_KEY: process.env.OPENROUTER_API_KEY,
-							GNEWS_API_KEY: process.env.GNEWS_API_KEY,
+							OPENROUTER_API_KEY: process.env.OPENROUTER_API_KEY as string,
+							GNEWS_API_KEY: process.env.GNEWS_API_KEY as string,
 						}
 					},
 					wrangler: {
