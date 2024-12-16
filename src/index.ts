@@ -12,7 +12,7 @@ const executeFetch = async (env: Env) => {
 	const searchQuery = await generateSearchQuery(env, articleMetadata.description);
 
 	const articlesMetadata = await getHeadlines(env, {
-		maxResults: 5,
+		maxResults: 3,
 		category: "general",
 		country: "ro",
 		lang: "ro",
