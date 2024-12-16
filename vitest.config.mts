@@ -13,7 +13,9 @@ export default defineWorkersProject(async () => {
 					miniflare: {
 						bindings: {
 							MIGRATIONS: migrations,
-							TEST: true
+							TEST: true,
+							OPENROUTER_API_KEY: process.env.OPENROUTER_API_KEY,
+							GNEWS_API_KEY: process.env.GNEWS_API_KEY,
 						}
 					},
 					wrangler: {
