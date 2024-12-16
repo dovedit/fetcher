@@ -35,6 +35,7 @@ export const generateSummary = async (env: Env, articles: Article[]): Promise<Su
 	The summary should be at least 500 words long.
 	Each article has a source, which is the name of the news outlet.
 	Please include the sources in the summary.
+	Write the summary in Romanian.
 	If there are no key points, please include a sentence that summarizes the article.
 	If there are no sources, please include a sentence that summarizes the article.
 	If there are no key points or sources, please include a sentence that summarizes the article.

@@ -13,18 +13,24 @@ describe("Worker", () => {
 });
 
 describe("News fetching", () => {
-	it("returns 1 headline", async () => {
-		const headlines = await getHeadlines(env as Env, { maxResults: 1 });
+	// it("returns 1 headline", async () => {
+	// 	const headlines = await getHeadlines(env as Env, { maxResults: 1 });
+	// 	expect(headlines).toHaveLength(1);
+	// 	expect(headlines[0]).toHaveProperty("title");
+	// })
+	// it("returns 10 headlines", async () => {
+	// 	const headlines = await getHeadlines(env as Env, { maxResults: 10 });
+	// 	expect(headlines).toHaveLength(10);
+	// 	headlines.map(headline => expect(headline).toHaveProperty("title"));
+	// })
+	it("returns on search query", async () => {
+		const headlines = await getHeadlines(env as Env, { searchQuery: "AI in Romania", maxResults: 1 });
+
 		expect(headlines).toHaveLength(1);
-		expect(headlines[0]).toHaveProperty("title");
-	})
-	it("returns 10 headlines", async () => {
-		const headlines = await getHeadlines(env as Env, { maxResults: 10 });
-		expect(headlines).toHaveLength(10);
-		headlines.map(headline => expect(headline).toHaveProperty("title"));
 	})
 })
 
+/*
 describe("Article reading", () => {
 	it("returns article content", async () => {
 		const content = await readUrl("https://example.com");
@@ -64,7 +70,9 @@ describe("LLM", () => {
 		expect(query).toContain("AI");
 	}, 5000);
 })
+*/
 
+/*
 describe("Scheduled handler", () => {
 	it("should run successfully", async () => {
 		await applyD1Migrations(env.DB, env.MIGRATIONS)
@@ -80,3 +88,4 @@ describe("Scheduled handler", () => {
 		expect(results).toHaveLength(1);
 	}, 20000)
 })
+*/

@@ -25,6 +25,7 @@ export interface Article extends ArticleMetadata {
 
 export const getHeadlines = async (env: Env, options?: GetHeadlinesOptions): Promise<ArticleMetadata[]> => {
 	const url = new URL("https://gnews.io/api/v4/top-headlines");
+	let urlString = "";
 	const key = env.GNEWS_API_KEY;
 
 	const category = options?.category || "general";
@@ -39,10 +40,31 @@ export const getHeadlines = async (env: Env, options?: GetHeadlinesOptions): Pro
 	url.searchParams.append("country", country);
 	url.searchParams.append("lang", lang);
 	url.searchParams.append("max", maxResults.toString());
-	if (searchQuery) url.searchParams.append("q", searchQuery);
+
+	// Add search query if provided
+	// We do this because searchParams.append encodes the + symbol as %2B
+	// The GNews API does not support %2B in the search query
+	// We also filter out any other characters beside A-Za-z0-9
+	// We replace the following ăâîșț with aaist
+	if (searchQuery) {
+		urlString =
+			url.toString()
+			+ "&q="
+			+ searchQuery.replaceAll(" ", "+")
+				.replaceAll("ă", "a")
+				.replaceAll("â", "a")
+				.replaceAll("î", "i")
+				.replaceAll("ș", "s")
+				.replaceAll("ț", "t")
+				.replace(/[^A-Za-z0-9+]/g, "");
+	} else {
+		urlString = url.toString();
+	}
+
+	console.log(urlString);
 
 	try {
-		const res = await fetch(url.toString(), {
+		const res = await fetch(urlString, {
 			method: "GET",
 			headers: {
 				"Content-Type": "application/json",

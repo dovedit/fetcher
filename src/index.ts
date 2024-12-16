@@ -19,19 +19,19 @@ const executeFetch = async (env: Env) => {
 		searchQuery: searchQuery
 	});
 
-	let articles: Article[] = [];
-	await Promise.all(articlesMetadata.map(async (articleMetadata) => {
-		const article = await getArticle(articleMetadata);
-		articles.push(article);
-	}));
+	let articles = await Promise.all(articlesMetadata.map((articleMetadata) => getArticle(articleMetadata)));
 
 	const summary = await generateSummary(env, articles);
 
 	const content = `
 		${summary.keyPoints.map((keyPoint) =>
-			`* ${keyPoint.point} &middot; ${keyPoint.summary}`
+			`* ${keyPoint.point} &middot; ${keyPoint.summary} \n`
 		)}
 	`
+
+	console.log(articles);
+	console.log(summary);
+	console.log(content);
 
 	// Put it into the database
 	const sqlQuery = `
@@ -55,7 +55,7 @@ export default {
 		if (new URL(req.url).pathname === '/ping') {
 			return new Response('Pong!');
 		// @ts-ignore: TEST is not defined in the type definitions, but is required for testing
-		} else if (new URL(req.url).pathname === '/__fetch' && env.TEST) {
+		} else if (new URL(req.url).pathname === '/__fetch' && !env.TEST) {
 			await executeFetch(env);
 			return new Response(JSON.stringify({ status: "ok" }), { status: 200 });
 		} else {
