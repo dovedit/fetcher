@@ -6,6 +6,9 @@ name: Test
 on:
   push:
     branches: [ "main" ]
+    paths:
+      - src/**
+      - test/**
   pull_request:
     branches: [ "main" ]
 
